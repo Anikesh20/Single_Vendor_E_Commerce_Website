@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Password from "./components/Password";
+import Login from "./Components/Login";
+import Signup from "./Components/Signup";
+import Password from "./Components/Password";
 
 const App: React.FC = () => {
   const [page, setPage] = useState<"login" | "signup" | "recovery">("login");
