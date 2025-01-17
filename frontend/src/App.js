@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Homepage from "./Components/HomePage";
+import HomePage from "./Components/HomePage";
 import Login from "./Components/Login";
 import ForgotPassword from "./Components/ForgotPassword";
 import SignIn from "./Components/SignIn"; 
@@ -9,7 +9,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Homepage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<SignIn />} /> 
