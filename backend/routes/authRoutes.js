@@ -1,15 +1,10 @@
 const express = require('express');
-const { register, login, recoverPassword } = require('../controllers/authController');
-
 const router = express.Router();
+const { registerUser, loginUser } = require('../controllers/authController');
+const validateRequest = require('../middleware/validateRequest');
+const { validateUserRegistration, validateLogin } = require('../utils/validators');
 
-// Register route
-router.post('/register', register);
-
-// Login route
-router.post('/login', login);
-
-// Password recovery route
-router.post('/recover-password', recoverPassword);
+router.post('/register', validateRequest(validateUserRegistration), registerUser);
+router.post('/login', validateRequest(validateLogin), loginUser);
 
 module.exports = router;
