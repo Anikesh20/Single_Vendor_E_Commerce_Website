@@ -28,7 +28,7 @@ const LoginPage = () => {
       {/* Login Page Content */}
       <div
         className="h-screen bg-cover bg-center"
-        style={{ backgroundImage: 'url("https://via.placeholder.com/1500x900")' }} // Add your background image URL here
+        style={{ backgroundImage: 'url("https://via.placeholder.com/1500x900")' }}
       >
         <div className="flex items-center justify-center h-full bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-80">
@@ -61,6 +61,7 @@ const LoginPage = () => {
             </form>
             <div className="text-center mt-4">
               <p className="text-gray-600">Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline">Sign Up</Link></p>
+              <p className="text-gray-600 mt-2"><Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot Password?</Link></p>
             </div>
           </div>
         </div>
