@@ -29,7 +29,7 @@ const categories = [
   'Kitchen',
 ];
 
-const Homepage = () => {
+const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -119,4 +119,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default HomePage;
