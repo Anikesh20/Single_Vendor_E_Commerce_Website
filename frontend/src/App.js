@@ -8,6 +8,7 @@ import CartPage from "./Components/CartPage";
 import SignUpPage from "./Components/SignUpPage";
 import LoginPage from "./Components/LoginPage";
 import ProductDetail from "./Components/ProductDetail";
+import ForgotPasswordPage from "./Components/ForgotPasswordPage"; // Import the ForgotPasswordPage component
 
 function App() {
   const products = {
@@ -59,6 +60,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/product/:category/:id" element={<ProductDetail products={products} />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} /> {/* Added ForgotPasswordPage route */}
       </Routes>
     </CartProvider>
   );
