@@ -42,6 +42,11 @@ const Header = () => {
                 Login
               </Link>
             </li>
+            <li>
+              <Link to="/admin" className="hover:text-blue-200 transition duration-300 ease-in-out">
+                Admin 
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -75,6 +80,11 @@ const Header = () => {
             <li>
               <Link to="/login" className="hover:text-blue-200 transition duration-300 ease-in-out block">
                 Login
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin" className="hover:text-blue-200 transition duration-300 ease-in-out">
+                Admin
               </Link>
             </li>
           </ul>

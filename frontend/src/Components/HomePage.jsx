@@ -1,53 +1,47 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom'; // Import Link component for navigation
 import Header from './Header';
 import Footer from './Footer';
-
-const products = [
-  { id: 1, name: 'Samsung Galaxy S23', price: '$999', image: 'https://via.placeholder.com/150', category: 'Mobile' },
-  { id: 2, name: 'Samsung QLED TV', price: '$1,499', image: 'https://via.placeholder.com/150', category: 'TVs' },
-  { id: 3, name: 'Samsung Galaxy Tab S9', price: '$799', image: 'https://via.placeholder.com/150', category: 'Tablets' },
-  { id: 4, name: 'Samsung Washing Machine', price: '$599', image: 'https://via.placeholder.com/150', category: 'Washing Machines' },
-  { id: 5, name: 'Samsung Soundbar', price: '$299', image: 'https://via.placeholder.com/150', category: 'Audio' },
-  { id: 6, name: 'Samsung Refrigerator', price: '$1,099', image: 'https://via.placeholder.com/150', category: 'Appliances' },
-  { id: 7, name: 'Samsung Monitor', price: '$399', image: 'https://via.placeholder.com/150', category: 'Monitors' },
-  { id: 8, name: 'Samsung Smartwatch', price: '$249', image: 'https://via.placeholder.com/150', category: 'Wearables' },
-  { id: 9, name: 'Samsung Air Conditioner', price: '$899', image: 'https://via.placeholder.com/150', category: 'Air Conditioning' },
-  { id: 10, name: 'Samsung Microwave Oven', price: '$199', image: 'https://via.placeholder.com/150', category: 'Kitchen' },
-];
 
 const categories = [
   'All',
   'Mobile',
   'TVs',
   'Tablets',
-  'Washing Machines',
+  'Washing_Machines',
   'Audio',
   'Appliances',
   'Monitors',
   'Wearables',
-  'Air Conditioning',
+  'Air_Conditioning',
   'Kitchen',
 ];
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [fadeIn, setFadeIn] = useState(false);
+  const [products, setProducts] = useState([]);
 
-  const filteredProducts =
-    selectedCategory === 'All'
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+  const fetchProducts = async (category) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/products/${category}`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
 
   useEffect(() => {
-    // Trigger fade-in animation
-    setFadeIn(true);
-  }, []);
+    fetchProducts(selectedCategory);
+    setFadeIn(true); // Trigger fade-in animation
+  }, [selectedCategory]);
 
   return (
     <div className={`transition-opacity ${fadeIn ? 'opacity-100' : 'opacity-0'} bg-white relative`}>
       <Header />
 
-      {/* Hero Section with Abstract Lines */}
+      {/* Hero Section */}
       <div className="relative h-96 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-white z-0" />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-20 z-10 transform rotate-12" />
@@ -89,19 +83,21 @@ const HomePage = () => {
 
       {/* Products Section */}
       <div className="mt-8 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <div
               key={product.id}
               className="border border-gray-300 rounded-lg p-4 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-48 object-cover rounded-md mb-4 transition-all duration-300"
-              />
-              <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
-              <p className="text-gray-700 text-sm mb-4">{product.price}</p>
+              <Link to={`/product/${product.id}`}>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-md mb-4 transition-all duration-300"
+                />
+                <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
+                <p className="text-gray-700 text-sm mb-4">{product.price}</p>
+              </Link>
               <button className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition duration-300">
                 Add to Cart
               </button>

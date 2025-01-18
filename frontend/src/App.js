@@ -6,6 +6,9 @@ import ForgotPassword from "./Components/ForgotPassword";
 import SignIn from "./Components/SignIn"; 
 import Contact from "./Components/Contact";
 import AboutUs from "./Components/AboutUs";
+import AdminDashboard from "./Components/AdminDashboard";
+import AdminPage from "./Components/AdminPage";
+import ProductDetailPage from "./Components/ProductDetailPage";
 const App = () => {
   return (
     <Router>
@@ -16,6 +19,9 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<SignIn />} /> 
         <Route path="/contact" element={<Contact />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/product/:id" component={ProductDetailPage} />
       </Routes>
     </Router>
   );
