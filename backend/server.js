@@ -23,7 +23,7 @@ app.use(cors({
 // Routes
 app.use(authRoutes);
 app.use(productRoutes);
-app.use(contactRoutes); // Add contact routes here
+app.use(contactRoutes); 
 
 // Start Server
 app.listen(PORT, () => {

@@ -5,7 +5,6 @@ exports.registerValidator = [
   check('email').isEmail().withMessage('Invalid email'),
   check('password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters'),
   check('name').notEmpty().withMessage('Name is required'),
-  // Add other fields as needed
 ];
 
 // Validator for login

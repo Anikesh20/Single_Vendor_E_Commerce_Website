@@ -49,7 +49,7 @@ const SignIn = () => {
     setError(null); // Clear previous errors
 
     try {
-      await axios.post("http://localhost:5000/api/users", formData); // Replace with your backend API endpoint
+      await axios.post("http://localhost:5000/api/users", formData); 
       setSuccess("User registered successfully!");
       setError(null);
       setFormData({
@@ -167,7 +167,7 @@ const SignIn = () => {
           <button
             type="submit"
             className="bg-blue-600 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700 transition w-full"
-            disabled={loading} // Disable the button while loading
+            disabled={loading} 
           >
             {loading ? "Registering..." : "Sign Up"}
           </button>

@@ -1,5 +1,3 @@
-// controllers/contactController.js
-
 const db = require('../config/db');
 
 // Handle Contact Form Submission

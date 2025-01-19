@@ -17,7 +17,7 @@ const AdminDashboard = () => {
       const response = await axios.get(`http://localhost:5000/products/${category}`);
       const fetchedProducts = response.data;
 
-      // Save fetched products to localStorage (optional)
+      // Save fetched products to localStorage
       localStorage.setItem(`products_${category}`, JSON.stringify(fetchedProducts));
 
       // Set state to fetched products
