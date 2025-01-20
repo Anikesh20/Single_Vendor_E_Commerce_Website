@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const { jwtSecret, jwtExpiration } = require('../config/jwt');
 
 // Register User
 exports.registerUser = async (req, res) => {
@@ -14,17 +15,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = {
-      name,
-      email,
-      password: hashedPassword,
-      phone,
-      address1,
-      address2,
-      city,
-      state,
-      postalCode,
-    };
+    const user = { name, email, password: hashedPassword, phone, address1, address2, city, state, postalCode };
 
     db.query('INSERT INTO users SET ?', user, (err, result) => {
       if (err) return res.status(500).json({ message: 'Error saving user', error: err });
@@ -51,7 +42,7 @@ exports.loginUser = (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret, { expiresIn: jwtExpiration });
 
     res.status(200).json({ message: 'Login successful', token });
   });

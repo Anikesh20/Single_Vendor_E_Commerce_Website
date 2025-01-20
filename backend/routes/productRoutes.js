@@ -2,16 +2,13 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 
-// Fetch Products
-router.get('/products/:category', productController.fetchProducts);
+// Add Product to a specific category
+router.post('/categories/:categoryId/products', productController.addProduct);
 
-// Add Product
-router.post('/products/:category', productController.addProduct);
+// Delete Product by ID under a specific category
+router.delete('/categories/:categoryId/products/:productId', productController.deleteProduct);
 
-// Update Product
-router.put('/products/:category/:id', productController.updateProduct);
-
-// Delete Product
-router.delete('/products/:category/:id', productController.deleteProduct);
+// Update Product by ID under a specific category
+router.put('/categories/:categoryId/products/:productId', productController.updateProduct);
 
 module.exports = router;

@@ -2,79 +2,84 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AdminDashboard = () => {
-  const [categories] = useState([
-    'Mobile', 'TVs', 'Tablets', 'Washing_Machines', 'Audio',
-    'Appliances', 'Monitors', 'Wearables', 'Air_Conditioning', 'Kitchen',
-  ]);
-  const [selectedCategory, setSelectedCategory] = useState('Mobile');
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: '', price: '', image: '' });
-  const [messages, setMessages] = useState([]);
+  const [categoryForm, setCategoryForm] = useState({ name: '' });
+  const [productForm, setProductForm] = useState({ name: '', price: '', image: '' });
 
-  // Fetch products dynamically based on the selected category
-  const fetchProducts = async (category) => {
+  // Fetch categories and their products
+  const fetchCategoriesWithProducts = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/products/${category}`);
-      const fetchedProducts = response.data;
-
-      // Save fetched products to localStorage
-      localStorage.setItem(`products_${category}`, JSON.stringify(fetchedProducts));
-
-      // Set state to fetched products
-      setProducts(fetchedProducts);
+      const response = await axios.get('http://localhost:5000/categories-with-products');
+      setCategories(response.data);
+      if (response.data.length > 0) {
+        setSelectedCategory(response.data[0].id);
+        setProducts(response.data[0].products || []);
+      }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching categories:', error);
     }
   };
 
-  // Fetch messages from users
-  const fetchMessages = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/messages');
-      setMessages(response.data); // Store retrieved messages
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
-
-  // Initialize products from localStorage if available
   useEffect(() => {
-    const savedProducts = localStorage.getItem(`products_${selectedCategory}`);
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    } else {
-      fetchProducts(selectedCategory);
+    fetchCategoriesWithProducts();
+  }, []);
+
+  // Handle Category Selection
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+    const selected = categories.find((category) => category.id === parseInt(categoryId, 10));
+    setProducts(selected?.products || []);
+  };
+
+  // Add New Category
+  const handleAddCategory = async () => {
+    try {
+      await axios.post('http://localhost:5000/categories', categoryForm);
+      fetchCategoriesWithProducts();
+      setCategoryForm({ name: '' });
+    } catch (error) {
+      console.error('Error adding category:', error);
     }
+  };
 
-    fetchMessages(); // Fetch user messages on component mount
-  }, [selectedCategory]);
+  // Delete Category
+  const handleDeleteCategory = async (categoryId) => {
+    try {
+      await axios.delete(`http://localhost:5000/categories/${categoryId}`);
+      fetchCategoriesWithProducts();
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
+  };
 
-  // Handle Add Product
+  // Add Product to Selected Category
   const handleAddProduct = async () => {
     try {
-      await axios.post(`http://localhost:5000/products/${selectedCategory}`, form);
-      fetchProducts(selectedCategory);
-      setForm({ name: '', price: '', image: '' });
+      await axios.post(`http://localhost:5000/categories/${selectedCategory}/products`, productForm);
+      fetchCategoriesWithProducts();
+      setProductForm({ name: '', price: '', image: '' });
     } catch (error) {
       console.error('Error adding product:', error);
     }
   };
 
-  // Handle Delete Product
-  const handleDeleteProduct = async (id) => {
+  // Delete Product
+  const handleDeleteProduct = async (productId) => {
     try {
-      await axios.delete(`http://localhost:5000/products/${selectedCategory}/${id}`);
-      fetchProducts(selectedCategory);
+      await axios.delete(`http://localhost:5000/categories/${selectedCategory}/products/${productId}`);
+      fetchCategoriesWithProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
     }
   };
 
-  // Handle Update Product
-  const handleUpdateProduct = async (id, updatedProduct) => {
+  // Update Product
+  const handleUpdateProduct = async (productId, updatedProduct) => {
     try {
-      await axios.put(`http://localhost:5000/products/${selectedCategory}/${id}`, updatedProduct);
-      fetchProducts(selectedCategory);
+      await axios.put(`http://localhost:5000/categories/${selectedCategory}/products/${productId}`, updatedProduct);
+      fetchCategoriesWithProducts();
     } catch (error) {
       console.error('Error updating product:', error);
     }
@@ -84,139 +89,113 @@ const AdminDashboard = () => {
     <div className="p-6 bg-gradient-to-r from-purple-600 via-blue-500 to-indigo-600 min-h-screen text-white">
       <h1 className="text-4xl font-bold text-center mb-8">Admin Dashboard</h1>
 
-      {/* Category Dropdown and Add Product Button */}
-      <div className="mb-6 flex justify-between items-center">
+      {/* Manage Categories */}
+      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-black">Manage Categories</h2>
+        <div className="flex items-center gap-4">
+          <input
+            type="text"
+            placeholder="New Category Name"
+            value={categoryForm.name}
+            onChange={(e) => setCategoryForm({ name: e.target.value })}
+            className="flex-1 p-3 rounded-lg border border-gray-300 text-black"
+          />
+          <button
+            onClick={handleAddCategory}
+            className="bg-green-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-600"
+          >
+            Add Category
+          </button>
+        </div>
+        <ul className="mt-4">
+          {categories.map((category) => (
+            <li key={category.id} className="flex justify-between items-center py-2 border-b text-black">
+              <span>{category.name}</span>
+              <button
+                onClick={() => handleDeleteCategory(category.id)}
+                className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Manage Products */}
+      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4 text-black">Manage Products</h2>
         <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-white text-gray-700 p-3 rounded-lg shadow-md transition-transform duration-300"
+          value={selectedCategory || ''}
+          onChange={(e) => handleCategoryChange(e.target.value)}
+          className="mb-4 w-full p-3 rounded-lg border border-gray-300 text-black"
         >
           {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
+            <option key={category.id} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>
-
-        <button
-          onClick={handleAddProduct}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
-        >
-          Add Product
-        </button>
-      </div>
-
-      {/* Products Table */}
-      <div className="mb-8 bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-        <h2 className="text-3xl font-semibold mb-6">Products in {selectedCategory}</h2>
-
-        <table className="w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gradient-to-r from-green-400 to-blue-500 text-white">
-              <th className="py-3 px-6 text-left">Name</th>
-              <th className="py-3 px-6 text-left">Price</th>
-              <th className="py-3 px-6 text-left">Image URL</th>
-              <th className="py-3 px-6 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.length > 0 ? (
-              products.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-gray-400">
-                  <td className="text-black py-3 px-6">{product.name}</td>
-                  <td className="text-black py-3 px-6">{product.price}</td>
-                  <td className="text-black py-3 px-6">{product.image}</td>
-                  <td className="text-black py-3 px-6 flex gap-2">
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600 transition-all duration-200"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleUpdateProduct(product.id, { ...product, price: product.price + 10 })}
-                      className="bg-yellow-500 text-white py-1 px-3 rounded-lg hover:bg-yellow-600 transition-all duration-200"
-                    >
-                      Update Price
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="py-3 px-6 text-center text-gray-500">
-                  No products available in this category.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add New Product Form */}
-      <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Add a New Product</h2>
-        <input
-          type="text"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="w-full text-black p-3 mb-4 rounded-lg border shadow-md"
-        />
-        <input
-          type="text"
-          placeholder="Price"
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-          className="w-full text-black p-3 mb-4 rounded-lg border shadow-md"
-        />
-        <input
-          type="text"
-          placeholder="Image URL"
-          value={form.image}
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
-          className="w-full text-black p-3 mb-4 rounded-lg border shadow-md"
-        />
-        <button
-          onClick={handleAddProduct}
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-all duration-300"
-        >
-          Add Product
-        </button>
-      </div>
-
-      {/* User Messages Section */}
-      <div className="mt-12 bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-        <h2 className="text-3xl font-semibold mb-6">User Messages</h2>
-
-        <table className="w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-              <th className="py-3 px-6 text-left">Name</th>
-              <th className="py-3 px-6 text-left">Email</th>
-              <th className="py-3 px-6 text-left">Phone</th>
-              <th className="py-3 px-6 text-left">Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {messages.length > 0 ? (
-              messages.map((message) => (
-                <tr key={message.id} className="border-b hover:bg-gray-200">
-                  <td className="text-black py-3 px-6">{message.name}</td>
-                  <td className="text-black py-3 px-6">{message.email}</td>
-                  <td className="text-black py-3 px-6">{message.phone}</td>
-                  <td className="text-black py-3 px-6">{message.message}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="py-3 px-6 text-center text-gray-500">
-                  No messages from users.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Product Name"
+            value={productForm.name}
+            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+            className="w-full p-3 mb-2 rounded-lg border border-gray-300 text-black"
+          />
+          <input
+            type="text"
+            placeholder="Product Price"
+            value={productForm.price}
+            onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+            className="w-full p-3 mb-2 rounded-lg border border-gray-300 text-black"
+          />
+          <input
+            type="text"
+            placeholder="Product Image URL"
+            value={productForm.image}
+            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+            className="w-full p-3 mb-2 rounded-lg border border-gray-300 text-black"
+          />
+          <button
+            onClick={handleAddProduct}
+            className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+          >
+            Add Product
+          </button>
+        </div>
+        <div>
+          {products.length > 0 ? (
+            products.map((product) => (
+              <div key={product.id} className="flex justify-between items-center py-2 border-b text-black">
+                <div>
+                  <p className="font-bold">{product.name}</p>
+                  <p>${product.price}</p>
+                  <p className="italic">{product.image}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleUpdateProduct(product.id, { ...product, price: product.price + 10 })
+                    }
+                    className="bg-yellow-500 text-white py-1 px-3 rounded-lg hover:bg-yellow-600"
+                  >
+                    Update Price
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No products available in this category.</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,31 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom'; 
-import Header from './Header';
-import Footer from './Footer';
-
-const categories = [
-  'All',
-  'Mobile',
-  'TVs',
-  'Tablets',
-  'Washing_Machines',
-  'Audio',
-  'Appliances',
-  'Monitors',
-  'Wearables',
-  'Air_Conditioning',
-  'Kitchen',
-];
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
+import { CartContext } from '../Context/CartContext'; // Import CartContext
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [fadeIn, setFadeIn] = useState(false);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // State for categories
+  const [successMessage, setSuccessMessage] = useState(''); // State for success message
 
+  // Use the CartContext
+  const { addToCart } = useContext(CartContext);  // Get addToCart function
+
+  // Fetch categories from backend
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/categories');
+      setCategories(['All', ...response.data.map(category => category.name)]); // Add 'All' category
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  // Fetch products based on selected category
   const fetchProducts = async (category) => {
     try {
-      const response = await axios.get(`http://localhost:5000/products/${category}`);
+      const endpoint = category === 'All' 
+        ? 'http://localhost:5000/products' 
+        : `http://localhost:5000/products/${category}`;
+      const response = await axios.get(endpoint);
       setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -33,9 +39,21 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    fetchProducts(selectedCategory);
+    fetchCategories(); // Fetch categories on page load
+    fetchProducts(selectedCategory); // Fetch products based on selected category
     setFadeIn(true); // Trigger fade-in animation
   }, [selectedCategory]);
+
+  // Handle Add to Cart functionality
+  const handleAddToCart = (product) => {
+    addToCart(product);  // Call addToCart function
+    setSuccessMessage(`${product.name} has been added to your cart!`); // Set success message
+
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 3000);
+  };
 
   return (
     <div className={`transition-opacity ${fadeIn ? 'opacity-100' : 'opacity-0'} bg-white relative`}>
@@ -59,6 +77,13 @@ const HomePage = () => {
         </div>
       </div>
 
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-white p-4 rounded-lg shadow-lg z-20">
+          <p>{successMessage}</p>
+        </div>
+      )}
+
       {/* Categories Section */}
       <div className="my-8 px-4">
         <h2 className="text-2xl font-bold mb-4 border-b-4 border-transparent bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 pb-2">
@@ -69,11 +94,9 @@ const HomePage = () => {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 transform ${
-                selectedCategory === category
-                  ? 'bg-blue-600 text-white scale-105'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
+              className={`px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 transform ${selectedCategory === category
+                ? 'bg-blue-600 text-white scale-105'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
             >
               {category}
             </button>
@@ -98,7 +121,10 @@ const HomePage = () => {
                 <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
                 <p className="text-gray-700 text-sm mb-4">{product.price}</p>
               </Link>
-              <button className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition duration-300">
+              <button
+                onClick={() => handleAddToCart(product)}  // Add to Cart functionality
+                className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition duration-300"
+              >
                 Add to Cart
               </button>
             </div>

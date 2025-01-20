@@ -47,6 +47,11 @@ const Header = () => {
                 Admin 
               </Link>
             </li>
+            <li>
+              <Link to="/cart" className="hover:text-blue-200 transition duration-300 ease-in-out">
+                Cart 
+              </Link>
+            </li>
           </ul>
         </nav>
 

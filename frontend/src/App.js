@@ -1,14 +1,16 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./Components/HomePage";
-import Login from "./Components/Login";
-import ForgotPassword from "./Components/ForgotPassword";
-import SignIn from "./Components/SignIn"; 
+import HomePage from "./pages/HomePage";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import SignIn from "./pages/SignIn"; 
 import Contact from "./Components/Contact";
-import AboutUs from "./Components/AboutUs";
+import AboutUs from "./pages/AboutUs";
 import AdminDashboard from "./Components/AdminDashboard";
-import AdminPage from "./Components/AdminPage";
+import AdminPage from "./pages/AdminPage";
 import ProductDetailPage from "./Components/ProductDetailPage";
+import CartPage from "./Components/CartPage";
+
 const App = () => {
   return (
     <Router>
@@ -21,7 +23,8 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/product/:id" component={ProductDetailPage} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     </Router>
   );
