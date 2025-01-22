@@ -8,7 +8,7 @@ const AdminDashboard = () => {
   const [categoryForm, setCategoryForm] = useState({ name: '' });
   const [productForm, setProductForm] = useState({ name: '', price: '', image: '' });
 
-  // Fetch categories and their products
+  // Fetch categories with their respective products
   const fetchCategoriesWithProducts = async () => {
     try {
       const response = await axios.get('http://localhost:5000/categories-with-products');
